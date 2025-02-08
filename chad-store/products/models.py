@@ -37,3 +37,8 @@ class Cart(TimeStampedModel, models.Model):
 class ProductImage(TimeStampedModel, models.Model):
     image = models.ImageField(upload_to='products/')
     product = models.ForeignKey('products.Product', related_name='images', on_delete=models.CASCADE)
+
+
+class FavoritedProduct(TimeStampedModel):
+    users = models.OneToOneField('users.User', on_delete=models.CASCADE, related_name='favorited_products')
+    products = models.ManyToManyField('products.Product', related_name='favorited_productss', blank=True, null=True)

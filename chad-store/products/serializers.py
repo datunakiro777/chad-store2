@@ -1,22 +1,16 @@
 from rest_framework import serializers
-from products.models import Review, Product
+from products.models import Review, Product, ProductTag, FavoritedProduct, Cart
 
 
-class ProductSerializer(serializers.Serializer):
-    name = serializers.CharField()
-    description = serializers.CharField()
-    price = serializers.FloatField()
-    currency = serializers.ChoiceField(choices=['GEL', 'USD', 'EUR'])
+class ProductSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Product
+        fields = '__all__'
 
-class CartSerializer(serializers.Serializer):
-    Product_id = serializers.IntegerField()
-    quantity = serializers.IntegerField()
-    def validate_product_id(self, value):
-        try:
-            Product.objects.get(id=value)
-        except Product.DoesNotExist:
-            raise serializers.ValidationError('product dose not exsist')
-        return value
+class CartSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Cart
+        fields = '__all__'
     
     def validate_quantity(self, value):
         if value <= 0:
@@ -24,16 +18,11 @@ class CartSerializer(serializers.Serializer):
         return value
     
 
-class Product_Tag_Serializer(serializers.Serializer):
-    product_id = serializers.IntegerField()
-    tag = serializers.CharField()
-
-    def validate_product_id(Self, value):
-        try:
-            Product.objects.get(id=value)
-        except Product.DoesNotExist:
-            raise serializers.ValidationError('product dose not exsist')
-        return value
+class Product_Tag_Serializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProductTag
+        fields = '__all__'
+    
     
     def validate_tag(self, value):
         id = self.product_id
@@ -41,3 +30,9 @@ class Product_Tag_Serializer(serializers.Serializer):
         if product.filter(product_tags__iexact=value):
             raise serializers.ValidationError('tag is already in product')
         return value
+    
+
+class FavoritedProductSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = FavoritedProduct
+        fields = "__all__"

@@ -1,10 +1,10 @@
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
-
-from products.models import Product, Review, Cart
-from products.serializers import ProductSerializer, CartSerializer, Product_Tag_Serializer
-
+from django.shortcuts import get_object_or_404
+from products.models import Product, Review, Cart, FavoritedProduct
+from products.serializers import ProductSerializer, CartSerializer, Product_Tag_Serializer, FavoritedProductSerializer
+from rest_framework.views import APIView
 
 @api_view(['GET', 'POST'])
 def product_view(request):
@@ -84,3 +84,18 @@ def product_tag_view(request):
             return Response({'product_tags' : new_product_tags}, status=status.HTTP_201_CREATED)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
+
+class FavoritedProductView(APIView):
+    def get(self, request):
+        favorited_products = FavoritedProduct.objects.all()
+        serializer = FavoritedProductSerializer(favorited_products)
+        return Response(serializer.data)
+    
+    def post(self, request):
+        serializer = FavoritedProductSerializer(data=request.data)
+        data = request.data
+        if serializer.is_valid():
+            product = get_object_or_404(Product, id=data.get('product_id'))
+            favorited_product = FavoritedProduct.objects.create(user=request.user, product=product)
+            return Response(serializer.data)
