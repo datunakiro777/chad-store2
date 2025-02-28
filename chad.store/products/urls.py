@@ -1,5 +1,8 @@
 from django.urls import path
 from products.views import ProductViewSet, ReviewViewSet, FavoriteProductViewSet, CartViewSet, TagList, ProductImageViewSet
+from rest_framework_nested import routers
+
+router = routers.Defa
 
 urlpatterns = [
     path('products/', ProductViewSet.as_view(), name="products"),
